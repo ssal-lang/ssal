@@ -1,0 +1,9 @@
+var VERSION = "1.2.3"
+
+task build:
+    ech "Builded some code"
+
+task test:
+    tsk "build"
+    ech "Running some version like $VERSION"
+    ech "Tested some code"
