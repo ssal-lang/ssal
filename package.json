@@ -2,7 +2,7 @@
   "name": "ssal",
   "version": "0.0.1",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "src/ssal.ts",
   "description": "SSAL (pronounced \"sal\" like the Portuguese word for salt) is a lightweight, cross-platform automation language designed to simplify project tasks such as building, running, and cleaning up files. It serves as an easy alternative to batch files, shell scripts, and Makefiles.",
   "scripts": {
     "build": "tsc",
@@ -22,8 +22,7 @@
   "files": [
     "bin/**/*",
     "readme.md",
-    "LICENSE",
-    "assets/**/*"
+    "LICENSE"
   ],
   "dependencies": {
     "boxen": "^7.1.1",
