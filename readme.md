@@ -1,5 +1,7 @@
 # SSAL (Super Simple Automating Language)
 
+[Docs](ssal-lang.github.io/ssal-docs/)
+
 SSAL (pronounced "sal" like the Portuguese word for salt) is a lightweight, cross-platform automation language designed to simplify project tasks such as building, running, and cleaning up files. It serves as an easy alternative to batch files, shell scripts, and Makefiles.
 
 ## Features
@@ -45,7 +47,7 @@ task run:
     run "./main"
 
 task clean:
-    delete "main"
+    del "main"
 ```
 
 ### Running Tasks
@@ -100,15 +102,3 @@ Tasks are defined using the `task` keyword, followed by the task name.
 task test:
     task commands run in order
 ```
-
-### Commands
-
-- `run`: Executes a shell command.
-- `ech`: Prints text to the console.
-- `delete`: Deletes a file.
-
-## Roadmap
-
-- Add support for conditional execution (`if OS == "Windows"`).
-- Implement parallel task execution.
-- Introduce a plugin system for custom commands.
