@@ -1,5 +1,0 @@
-var VERSION = "3.2.1"
-
-task test:
-    ech "Running the other test from tasks2!"
-    ech "This version is $VERSION"

@@ -1,9 +1,5 @@
-var VERSION = "1.2.3"
+task run_tests:
+    ech "nothing rn"
 
-task build:
-    ech "Builded some code"
-
-task test:
-    tsk "build"
-    ech "Running some version like $VERSION"
-    ech "Tested some code"
+# ssal -f tests/args.ssal named --test1 ola --test2 adeus
+# ssal -f tests/args.ssal unnamed !ola !adeus

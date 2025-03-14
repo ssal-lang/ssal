@@ -47,7 +47,7 @@ function createSpinner(text: string) {
 
 function printVersion() {
   const version = getPackageVersion();
-  console.log(chalk.cyanBright(`SSAL version ${version}`));
+  console.log(chalk.cyanBright(`  SSAL version ${version}`));
 }
 
 function printHelp() {
@@ -55,14 +55,19 @@ function printHelp() {
   ${chalk.cyanBright('Usage:')} ${chalk.whiteBright('ssal')} ${chalk.magentaBright('[options]')} ${chalk.magentaBright('[tasks...]')}
 
   ${chalk.cyanBright('Options:')}
-  ${chalk.magentaBright('--file, -f')} ${chalk.yellowBright('<file>')}   Specify the SSAL file (default: tasks.ssal)
-  ${chalk.magentaBright('--list, -l')}          List all available tasks
-  ${chalk.magentaBright('--help, -h')}          Show this help message
+  ${chalk.magentaBright('--file, -f')} ${chalk.yellowBright('<file>')}               Specify the SSAL file (default: tasks.ssal)
+  ${chalk.magentaBright('--list, -l')}                      List all available tasks
+  ${chalk.magentaBright('--help, -h')}                      Show this help message
+
+  ${chalk.cyanBright('Arguments:')}
+  ${chalk.magentaBright('!value')}                          Positional argument
+  ${chalk.magentaBright('--name')} ${chalk.yellowBright('!value')}                   Named argument
 
   ${chalk.cyanBright('Examples:')}
-  ${chalk.whiteBright('ssal')} ${chalk.magentaBright('build')}          Run the "build" task
-  ${chalk.whiteBright('ssal')} ${chalk.magentaBright('build run')}      Run "build" then "run" tasks
-  ${chalk.whiteBright('ssal')} ${chalk.magentaBright('-l')}             List all available tasks
+  ${chalk.whiteBright('ssal')} ${chalk.magentaBright('build !src/main.cpp')}        Run "build" with an argument
+  ${chalk.whiteBright('ssal')} ${chalk.magentaBright('build run')}                  Run "build" then "run" tasks
+  ${chalk.whiteBright('ssal')} ${chalk.magentaBright('compile --file !main.cpp')}   Run "compile" with named arguments
+  ${chalk.whiteBright('ssal')} ${chalk.magentaBright('-l')}                         List all available tasks
   `);
 }
 
@@ -77,7 +82,7 @@ async function main() {
     printHelp();
     return;
   }
-  
+
   // Check for help flag
   if (args.includes('--help') || args.includes('-h')) {
     displayBanner();
@@ -92,7 +97,7 @@ async function main() {
     console.log('\n');
     return;
   }
-  
+
   // Find SSAL file
   let ssalFile = DEFAULT_FILENAME;
   const fileArgIndex = args.findIndex(arg => arg === '--file' || arg === '-f');
@@ -100,14 +105,14 @@ async function main() {
     ssalFile = args[fileArgIndex + 1];
     args.splice(fileArgIndex, 2); // Remove file args
   }
-  
+
   const filePath = path.resolve(process.cwd(), ssalFile);
   if (!fs.existsSync(filePath)) {
     console.error(chalk.redBright(`❌ Error: SSAL file "${ssalFile}" not found`));
     console.log('\n');
     process.exit(1);
   }
-  
+
   try {
     // Parse SSAL file
     const spinner = createSpinner(chalk.cyanBright(`📝 Parsing "${ssalFile}"...`));
@@ -115,7 +120,7 @@ async function main() {
 
     const script = parseSSAL(filePath);
     spinner.succeed(chalk.greenBright(`📝 Parsed "${ssalFile}" successfully \n`));
-    
+
     // Check for list flag
     if (args.includes('--list') || args.includes('-l')) {
       console.log(chalk.cyanBright('📋 Available tasks:'));
@@ -130,25 +135,59 @@ async function main() {
       console.log('\n');
       return;
     }
-    
+
     // Execute specified tasks
     const executor = new Executor(script);
-    
-    for (const taskName of args) {
-      console.log(chalk.cyanBright(`🔄 Executing task: ${taskName}`));
+
+    let currentTask = '';
+    let currentArgs: string[] = [];
+    const namedArgs: { [key: string]: string } = {};
+
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i];
+      if (arg.startsWith('--')) {
+        const key = arg.slice(2);
+        const value = args[i + 1];
+        namedArgs[key] = value;
+        i++; // Skip the next argument as it is the value
+      } else if (arg.startsWith('!')) {
+        currentArgs.push(arg.slice(1));
+      } else {
+        if (currentTask) {
+          executor.setTaskArgs(currentTask, currentArgs);
+          executor.setNamedArgs(namedArgs);
+          console.log(chalk.cyanBright(`🔄 Executing task: ${currentTask}`));
+          console.log(chalk.grey(`📢 Task output:\n`));
+
+          const result = await executor.executeTask(currentTask);
+
+          if (!result.success) {
+            console.log(chalk.redBright(`\n❌ ${result.message}`));
+            console.log('\n');
+            process.exit(1);
+          }
+
+          currentArgs = [];
+        }
+        currentTask = arg;
+      }
+    }
+
+    if (currentTask) {
+      executor.setTaskArgs(currentTask, currentArgs);
+      executor.setNamedArgs(namedArgs);
+      console.log(chalk.cyanBright(`🔄 Executing task: ${currentTask}`));
       console.log(chalk.grey(`📢 Task output:\n`));
 
-      const result = await executor.executeTask(taskName);
-      
-      if (result.success) {
-        console.log(chalk.greenBright(`\n✅ Task "${taskName}" completed successfully`));
-      } else {
+      const result = await executor.executeTask(currentTask);
+
+      if (!result.success) {
         console.log(chalk.redBright(`\n❌ ${result.message}`));
         console.log('\n');
         process.exit(1);
       }
     }
-    
+
     console.log(chalk.greenBright('\n🎉 All tasks completed successfully! 🎉'));
     console.log('\n');
   } catch (error) {

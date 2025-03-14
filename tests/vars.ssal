@@ -1,0 +1,7 @@
+task main_task:
+    ech "I got this argument !1"
+    var GOBAL_ARG = "!1"
+    tsk "another_task"
+
+task another_task:
+    ech "GOBAL_ARG = $GOBAL_ARG"

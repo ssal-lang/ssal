@@ -32,17 +32,19 @@ export function parseSSALContent(content: string): SSALScript {
     if (line === '' || line.startsWith('#')) {
       continue;
     }
-    
-    // Parse variable declaration
-    if (line.startsWith('var ')) {
+
+    if (line.startsWith('var ')) { 
       const varMatch = line.match(/var\s+(\w+)\s*=\s*"([^"]*)"$/);
-      if (varMatch) {
-        script.variables.push({
-          name: varMatch[1],
-          value: varMatch[2]
-        });
-      }
-      continue;
+      if (varMatch) { 
+        if (currentTask){ 
+          // When inside a task, treat as a command instead of a global variable declaration
+          currentTask.commands.push({ type: 'var', args: [varMatch[1], varMatch[2]] }); 
+        } else { 
+          // Global variable declaration outside any task
+          script.variables.push({ name: varMatch[1], value: varMatch[2] });
+        } 
+      } 
+      continue; 
     }
     
     // Parse task definition

@@ -47,21 +47,4 @@ if (!fs.existsSync(cliFile)) {
   }
 }
 
-// Copy package.json to bin directory for version information
-console.log('Copying package.json for version information...');
-try {
-  // Read package.json and create a minimal version with just name, version, and description
-  const packageData = JSON.parse(fs.readFileSync(packageJson, 'utf8'));
-  const minimalPackage = {
-    name: packageData.name,
-    version: packageData.version,
-    description: packageData.description
-  };
-  
-  fs.writeFileSync(packageJsonDest, JSON.stringify(minimalPackage, null, 2));
-  console.log('Copied minimal package.json to bin directory');
-} catch (error) {
-  console.error('Failed to copy package.json:', error);
-}
-
 console.log('CLI preparation complete!');
