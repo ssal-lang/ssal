@@ -60,13 +60,13 @@ function printHelp() {
   ${chalk.magentaBright('--help, -h')}                      Show this help message
 
   ${chalk.cyanBright('Arguments:')}
-  ${chalk.magentaBright('!value')}                          Positional argument
-  ${chalk.magentaBright('--name')} ${chalk.yellowBright('!value')}                   Named argument
+  ${chalk.magentaBright('?value')}                          Positional argument
+  ${chalk.magentaBright('--name')} ${chalk.yellowBright('value')}                    Named argument
 
   ${chalk.cyanBright('Examples:')}
-  ${chalk.whiteBright('ssal')} ${chalk.magentaBright('build !src/main.cpp')}        Run "build" with an argument
+  ${chalk.whiteBright('ssal')} ${chalk.magentaBright('build ?src/main.cpp')}        Run "build" with an argument
   ${chalk.whiteBright('ssal')} ${chalk.magentaBright('build run')}                  Run "build" then "run" tasks
-  ${chalk.whiteBright('ssal')} ${chalk.magentaBright('compile --file !main.cpp')}   Run "compile" with named arguments
+  ${chalk.whiteBright('ssal')} ${chalk.magentaBright('compile --file main.cpp')}    Run "compile" with named arguments
   ${chalk.whiteBright('ssal')} ${chalk.magentaBright('-l')}                         List all available tasks
   `);
 }
@@ -150,7 +150,7 @@ async function main() {
         const value = args[i + 1];
         namedArgs[key] = value;
         i++; // Skip the next argument as it is the value
-      } else if (arg.startsWith('!')) {
+      } else if (arg.startsWith('?')) {
         currentArgs.push(arg.slice(1));
       } else {
         if (currentTask) {

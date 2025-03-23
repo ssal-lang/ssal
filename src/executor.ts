@@ -112,12 +112,12 @@ export class Executor {
     // Replace task-specific arguments
     const taskArgs = this.taskArgs[taskName] || [];
     taskArgs.forEach((arg, index) => {
-      result = result.replace(new RegExp(`!${index + 1}`, 'g'), arg);
+      result = result.replace(new RegExp(`\\?${index + 1}`, 'g'), arg);
     });
 
     // Replace named arguments
     for (const [key, value] of Object.entries(this.namedArgs)) {
-      result = result.replace(new RegExp(`!${key}`, 'g'), value);
+      result = result.replace(new RegExp(`\\?${key}`, 'g'), value);
     }
 
     // Replace script variables
